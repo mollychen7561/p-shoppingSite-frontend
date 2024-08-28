@@ -1,12 +1,12 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
 import { useUser } from "@/components/profile/UserContext";
 import Image from "next/image";
 import Link from "next/link";
 import { toast } from "react-toastify";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { userApi } from "@/app/lib/api/userApi";
 
 interface Product {
   id: number;
@@ -34,37 +34,21 @@ const WishlistPage = () => {
       setError(null);
       try {
         // Get favorite product IDs
-        const favoritesResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/favorites`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-
-        const favoriteIds = favoritesResponse.data.favorites;
+        const favoriteIds = await userApi.getFavorites(token);
 
         // Fetch details for each favorite product
         const productPromises = favoriteIds.map((id: number) =>
-          axios.get(`https://fakestoreapi.com/products/${id}`)
+          fetch(`https://fakestoreapi.com/products/${id}`).then((res) =>
+            res.json()
+          )
         );
 
-        const productResponses = await Promise.all(productPromises);
-        const favoriteProducts = productResponses.map(
-          (response) => response.data
-        );
+        const favoriteProducts = await Promise.all(productPromises);
 
         setFavorites(favoriteProducts);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 401) {
-            setError("Please login to view your wishlist");
-          } else {
-            setError(
-              error.response?.data?.message || "Failed to load wishlist"
-            );
-          }
+        if (error instanceof Error) {
+          setError(error.message || "Failed to load wishlist");
         } else {
           setError("An unexpected error occurred");
         }
@@ -79,15 +63,7 @@ const WishlistPage = () => {
   // Remove a product from favorites
   const removeFavorite = async (productId: number) => {
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/favorites/remove`,
-        { productId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      await userApi.removeFavorite(token, productId);
       setFavorites(favorites.filter((product) => product.id !== productId));
       toast.success("Product removed from wishlist");
     } catch (error) {

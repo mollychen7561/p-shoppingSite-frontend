@@ -8,7 +8,7 @@ import React, {
   useMemo
 } from "react";
 import { useUser } from "@/components/profile/UserContext";
-import axios from "axios";
+import { userApi } from "@/app/lib/api/userApi";
 
 interface CartItem {
   productId: string;
@@ -42,18 +42,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
   const [cartLoaded, setCartLoaded] = useState(false);
   const { user, token } = useUser();
 
-  // Update cart on server
   const updateServerCart = useCallback(
     async (cart: CartItem[]) => {
       if (user && token) {
         try {
-          await axios.put(
-            `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/cart`,
-            { cart },
-            {
-              headers: { Authorization: `Bearer ${token}` }
-            }
-          );
+          await userApi.updateCart(token, cart);
         } catch (error) {
           console.error("Error updating server cart:", error);
         }
@@ -62,7 +55,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     [user, token]
   );
 
-  // Load cart from local storage or server
   const loadCart = useCallback(async () => {
     if (loadingCart || cartLoaded) return;
     setLoadingCart(true);
@@ -71,16 +63,11 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
 
       if (user && token) {
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/cart`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
+        const serverCart = await userApi.getCart(token);
 
-        if (response.data.cart && response.data.cart.length > 0) {
-          setCartItems(response.data.cart);
-          localStorage.setItem("cart", JSON.stringify(response.data.cart));
+        if (serverCart && serverCart.length > 0) {
+          setCartItems(serverCart);
+          localStorage.setItem("cart", JSON.stringify(serverCart));
         } else if (localCart.length > 0) {
           setCartItems(localCart);
           await updateServerCart(localCart);
@@ -100,22 +87,16 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [user, token, updateServerCart, loadingCart, cartLoaded]);
 
-  // Load cart on initial render
   useEffect(() => {
     if (!cartLoaded) {
       loadCart();
     }
   }, [loadCart, cartLoaded]);
 
-  // Modified handleLogout function
   const handleLogout = useCallback(() => {
-    // Clear local cart state
     setCartItems([]);
-    // Clear local storage cart
     localStorage.removeItem("cart");
-    // Reset total items count
     setTotalItems(0);
-    // Reset cart loaded state
     setCartLoaded(false);
   }, []);
 
@@ -126,7 +107,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     };
   }, [handleLogout]);
 
-  // Update total items count
   useEffect(() => {
     const newTotal = cartItems.reduce(
       (total, item) => total + item.quantity,
@@ -136,7 +116,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     window.dispatchEvent(new Event("cartUpdate"));
   }, [cartItems]);
 
-  // Add item to cart
   const addToCart = useCallback(
     async (newItem: CartItem) => {
       setCartItems((prevItems) => {
@@ -157,14 +136,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
 
         localStorage.setItem("cart", JSON.stringify(updatedCartItems));
 
-        const newTotalItems = updatedCartItems.reduce(
-          (total, item) => total + item.quantity,
-          0
-        );
-        setTotalItems(newTotalItems);
-
-        window.dispatchEvent(new Event("cartUpdate"));
-
         return updatedCartItems;
       });
 
@@ -179,7 +150,6 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     [user, token, updateServerCart, cartItems]
   );
 
-  // Remove item from cart
   const removeFromCart = useCallback(
     async (productId: string) => {
       setCartItems((prevItems) => {
@@ -193,12 +163,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       if (user && token) {
         await updateServerCart(cartItems);
       }
-      window.dispatchEvent(new Event("cartUpdate"));
     },
     [user, token, updateServerCart, cartItems]
   );
 
-  // Update item quantity
   const updateQuantity = useCallback(
     async (productId: string, quantity: number) => {
       setCartItems((prevItems) => {
@@ -216,12 +184,10 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
       if (user && token) {
         await updateServerCart(cartItems);
       }
-      window.dispatchEvent(new Event("cartUpdate"));
     },
     [user, token, updateServerCart, cartItems]
   );
 
-  // Clear cart
   const clearCart = useCallback(async () => {
     setCartItems([]);
     setTotalItems(0);
@@ -229,18 +195,14 @@ export const CartProvider: React.FC<{ children: ReactNode }> = ({
     if (user && token) {
       await updateServerCart([]);
     }
-    window.dispatchEvent(new Event("cartUpdate"));
   }, [user, token, updateServerCart]);
 
   const getTotalItems = useCallback(() => totalItems, [totalItems]);
 
-  // Refresh cart
   const refreshCart = useCallback(async () => {
     await loadCart();
-    window.dispatchEvent(new Event("cartUpdate"));
   }, [loadCart]);
 
-  // Memoized context value
   const contextValue = useMemo(
     () => ({
       cartItems,

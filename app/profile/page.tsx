@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import axios from "axios";
 import {
   Avatar,
   Card,
@@ -12,43 +11,33 @@ import {
 } from "@material-tailwind/react";
 import { HeartIcon, ShoppingBagIcon } from "@heroicons/react/24/solid";
 import { useUser } from "@/components/profile/UserContext";
+import { userApi } from "@/app/lib/api/userApi";
+
+interface UserData {
+  name: string;
+  email: string;
+}
 
 const ProfilePage = () => {
-  const [userData, setUserData] = useState({ name: "", email: "" });
+  const [userData, setUserData] = useState<UserData>({ name: "", email: "" });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const { user, token } = useUser();
 
   useEffect(() => {
-    if (!user) {
-      console.error("no user");
+    if (!user || !token) {
       setLoading(false);
-      return;
-    }
-
-    if (!token) {
-      console.error("no token");
-      setLoading(false);
+      setError("Please log in to view your profile.");
       return;
     }
 
     const fetchUserData = async () => {
       try {
-        console.log("Fetching user data with token:", token);
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/profile`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
-        );
-        console.log("User data fetched:", response.data);
-        setUserData(response.data);
+        const data = await userApi.getProfile(token);
+        setUserData(data);
       } catch (error) {
-        console.error(
-          "Error fetching user data:",
-          error.response?.data || error
-        );
+        console.error("Error fetching user data:", error);
+        setError("Failed to load user data. Please try again.");
       } finally {
         setLoading(false);
       }
@@ -58,11 +47,11 @@ const ProfilePage = () => {
   }, [user, token]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <div className="text-center mt-10">Loading...</div>;
   }
 
-  if (!user) {
-    return <div>Please log in to view your profile.</div>;
+  if (error) {
+    return <div className="text-center mt-10 text-red-500">{error}</div>;
   }
 
   return (

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { Card, Typography } from "@material-tailwind/react";
 import { useUser } from "@/components/profile/UserContext";
-import axios from "axios";
+import { userApi } from "@/app/lib/api/userApi";
 import Image from "next/image";
 
 // Define table headers
@@ -49,21 +49,12 @@ const OrdersPage = () => {
       setIsLoading(true);
       setError(null);
       try {
-        // Fetch orders from the API
-        const response = await axios.get(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/orders`,
-          {
-            headers: { Authorization: `Bearer ${token}` }
-          }
-        );
-        setOrders(response.data);
+        // Fetch orders using the API client
+        const data = await userApi.getOrders(token);
+        setOrders(data);
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response?.status === 401) {
-            setError("Please login to view your orders");
-          } else {
-            setError(error.response?.data?.message || "Failed to load orders");
-          }
+        if (error instanceof Error) {
+          setError(error.message || "Failed to load orders");
         } else {
           setError("An unexpected error occurred");
         }

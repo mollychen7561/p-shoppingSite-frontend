@@ -25,7 +25,7 @@ import {
   MinusIcon,
   TrashIcon
 } from "@heroicons/react/24/outline";
-import axios from "axios";
+import { userApi } from "@/app/lib/api/userApi";
 
 const CheckOutPage = () => {
   const router = useRouter();
@@ -145,29 +145,23 @@ const CheckOutPage = () => {
 
     try {
       // Send order to the server
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/orders`,
-        {
-          items: cartItems.map((item) => ({
-            productId: item.productId,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            image: item.image
-          })),
-          total: isCouponApplied ? discountedTotal : originalTotal,
-          shippingInfo: {
-            phoneNumber,
-            address,
-            paymentMethod
-          }
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
+      const response = await userApi.createOrder(token, {
+        items: cartItems.map((item) => ({
+          productId: item.productId,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image
+        })),
+        total: isCouponApplied ? discountedTotal : originalTotal,
+        shippingInfo: {
+          phoneNumber,
+          address,
+          paymentMethod
         }
-      );
+      });
 
-      if (response.status === 201) {
+      if (response.success) {
         setIsModalOpen(true);
         clearCart();
       }

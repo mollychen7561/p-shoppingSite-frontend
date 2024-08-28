@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   Card,
   Input,
@@ -8,28 +7,35 @@ import {
   IconButton
 } from "@material-tailwind/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { userApi } from "@/app/lib/api/userApi";
 
-export function SignUpForm({ onClose, onSignUpSuccess }) {
+interface SignUpFormProps {
+  onClose: () => void;
+  onSignUpSuccess: () => void;
+}
+
+export function SignUpForm({ onClose, onSignUpSuccess }: SignUpFormProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
 
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/register`,
-        { name, email, password }
-      );
-      setMessage(response.data.message);
-      if (response.data.message === "User registered successfully") {
+      const response = await userApi.register({ name, email, password });
+      setMessage(response.message);
+      if (response.message === "User registered successfully") {
         onSignUpSuccess();
       }
     } catch (error) {
-      setMessage(error.response?.data?.message || "Registration failed");
+      if (error instanceof Error) {
+        setMessage(error.message || "Registration failed");
+      } else {
+        setMessage("An unexpected error occurred");
+      }
     }
   };
 

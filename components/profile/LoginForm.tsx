@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   Card,
   Input,
@@ -9,70 +8,47 @@ import {
 } from "@material-tailwind/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useUser } from "@/components/profile/UserContext";
+import { userApi } from "@/app/lib/api/userApi";
 
-export function LoginForm({ onClose, onLoginSuccess }) {
+interface LoginFormProps {
+  onClose: () => void;
+  onLoginSuccess: () => void;
+}
+
+export function LoginForm({ onClose, onLoginSuccess }: LoginFormProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const { login } = useUser();
 
-  const handleLogin = async (e) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setMessage("");
 
     try {
-      console.log(
-        "Sending request to:",
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/login`
-      );
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/login`,
-        { email, password },
-        {
-          withCredentials: true,
-          headers: {
-            "Content-Type": "application/json"
-          }
-        }
-      );
-      console.log("Response received:", response);
+      const response = await userApi.login({ email, password });
 
-      if (response.data && response.data.user && response.data.token) {
+      if (response.user && response.token) {
         const userData = {
-          id: response.data.user._id || response.data.user.id,
-          name: response.data.user.name,
-          email: response.data.user.email
+          id: response.user._id || response.user.id,
+          name: response.user.name,
+          email: response.user.email
         };
-        const token = response.data.token;
-        console.log("Logged in user data:", userData);
-        console.log("Received token:", token);
+        const token = response.token;
 
         await login(userData, token);
 
-        setMessage(response.data.message || "Login successful");
+        setMessage(response.message || "Login successful");
         onLoginSuccess();
-
-        const storedAuth = JSON.parse(localStorage.getItem("auth"));
-        // console.log("Verifying stored auth data:", storedAuth);
 
         window.dispatchEvent(new Event("cartUpdate"));
       } else {
-        // console.error("Unexpected response structure:", response.data);
         setMessage("Login failed: Unexpected response from server");
       }
     } catch (error) {
       console.error("Login error:", error);
-      if (axios.isAxiosError(error)) {
-        if (error.code === "ECONNABORTED") {
-          console.error("Request timed out");
-          setMessage("Login failed: Request timed out");
-        } else {
-          // console.error("Axios error details:", error.response?.data);
-          setMessage(
-            error.response?.data?.message ||
-              "Login failed: " + (error.response?.status || "Unknown error")
-          );
-        }
+      if (error instanceof Error) {
+        setMessage(`Login failed: ${error.message}`);
       } else {
         setMessage("An unexpected error occurred");
       }

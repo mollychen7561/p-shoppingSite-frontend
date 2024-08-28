@@ -6,10 +6,11 @@ import React, {
   ReactNode,
   useCallback
 } from "react";
-import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 import { useRouter } from "next/navigation";
+import { userApi } from "@/app/lib/api/userApi";
 
+// Define types for User and AuthState
 interface User {
   id: string;
   name: string;
@@ -21,6 +22,7 @@ interface AuthState {
   token: string | null;
 }
 
+// Define the shape of the UserContext
 interface UserContextType {
   user: User | null;
   token: string | null;
@@ -36,9 +38,10 @@ interface UserProviderProps {
   children: ReactNode;
 }
 
+// Create the UserContext
 const UserContext = createContext<UserContextType | undefined>(undefined);
 
-// Check if the token is valid and not expired
+// Function to check if a token is valid and not expired
 const isTokenValid = (token: string | null): boolean => {
   if (!token) return false;
   try {
@@ -49,6 +52,7 @@ const isTokenValid = (token: string | null): boolean => {
   }
 };
 
+// UserProvider component
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [authState, setAuthState] = useState<AuthState>({
     user: null,
@@ -57,6 +61,16 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [showLogoutAlert, setShowLogoutAlert] = useState(false);
   const router = useRouter();
+
+  // Handle token expiration
+  const handleTokenExpiration = useCallback(() => {
+    logout();
+    setShowLogoutAlert(true);
+    setTimeout(() => {
+      setShowLogoutAlert(false);
+      router.push("/");
+    }, 5000);
+  }, [router]);
 
   // Load user data from local storage on initial render
   useEffect(() => {
@@ -70,11 +84,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
             parsedAuth.token &&
             isTokenValid(parsedAuth.token)
           ) {
+            // Ensure user id is set correctly
             if (!parsedAuth.user.id && (parsedAuth.user as any)._id) {
               parsedAuth.user.id = (parsedAuth.user as any)._id;
             }
             setAuthState(parsedAuth);
-            await loadServerCart(parsedAuth.token);
+            await userApi.getCart(parsedAuth.token);
           } else {
             throw new Error("Invalid or expired stored auth data");
           }
@@ -87,48 +102,12 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     };
 
     loadUser();
-  }, []);
-
-  // Handle token expiration
-  const handleTokenExpiration = useCallback(() => {
-    logout();
-    setShowLogoutAlert(true);
-    setTimeout(() => {
-      setShowLogoutAlert(false);
-      router.push("/");
-    }, 5000);
-  }, [router]);
-
-  // Set up axios interceptor for handling 401 errors
-  useEffect(() => {
-    const interceptor = axios.interceptors.response.use(
-      (response) => response,
-      (error) => {
-        if (error.response && error.response.status === 401) {
-          handleTokenExpiration();
-        }
-        return Promise.reject(error);
-      }
-    );
-
-    return () => {
-      axios.interceptors.response.eject(interceptor);
-    };
   }, [handleTokenExpiration]);
 
   // Refresh the auth token
   const refreshToken = async () => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/refresh-token`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${authState.token}`
-          }
-        }
-      );
-      const newToken = response.data.token;
+      const newToken = await userApi.refreshToken(authState.token!);
       setAuthState((prev) => ({ ...prev, token: newToken }));
       localStorage.setItem(
         "auth",
@@ -138,21 +117,6 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     } catch (error) {
       handleTokenExpiration();
       return null;
-    }
-  };
-
-  // Load cart from server
-  const loadServerCart = async (token: string) => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/cart`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
-      localStorage.setItem("cart", JSON.stringify(response.data.cart));
-    } catch (error) {
-      console.error("Error loading server cart:", error);
     }
   };
 
@@ -169,13 +133,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
     if (localCart.length > 0) {
       try {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/users/merge-cart`,
-          { cart: localCart },
-          {
-            headers: { Authorization: `Bearer ${newToken}` }
-          }
-        );
+        await userApi.mergeCart(newToken, localCart);
         localStorage.removeItem("cart");
       } catch (error) {
         console.error("Error merging cart:", error);
@@ -183,7 +141,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     }
 
     // Load server cart
-    await loadServerCart(newToken);
+    await userApi.getCart(newToken);
 
     // Trigger cart update event
     window.dispatchEvent(new Event("cartUpdate"));
@@ -203,6 +161,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
     return authState.user;
   }, [authState.user]);
 
+  // Provide the context value
   return (
     <UserContext.Provider
       value={{
@@ -221,6 +180,7 @@ export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
   );
 };
 
+// Custom hook to use the UserContext
 export const useUser = () => {
   const context = useContext(UserContext);
   if (context === undefined) {
