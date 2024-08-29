@@ -13,10 +13,17 @@ import { userApi } from "@/app/lib/api/userApi";
 interface LoginFormProps {
   onClose: () => void;
   onLoginSuccess: () => void;
+  initialEmail?: string;
+  welcomeMessage?: string;
 }
 
-export function LoginForm({ onClose, onLoginSuccess }: LoginFormProps) {
-  const [email, setEmail] = useState("");
+export function LoginForm({
+  onClose,
+  onLoginSuccess,
+  initialEmail = "",
+  welcomeMessage = ""
+}: LoginFormProps) {
+  const [email, setEmail] = useState(initialEmail);
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState("");
   const { login } = useUser();

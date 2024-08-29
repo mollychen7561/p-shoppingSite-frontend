@@ -21,7 +21,8 @@ import {
   Typography,
   Button,
   IconButton,
-  Dialog
+  Dialog,
+  Alert
 } from "@material-tailwind/react";
 import {
   HomeIcon,
@@ -41,6 +42,9 @@ export function MainNavbar() {
   const [openLogInModal, setOpenLogInModal] = useState(false);
   const [openCart, setOpenCart] = useState(false);
   const [cartItemCount, setCartItemCount] = useState(0);
+  const [registeredEmail, setRegisteredEmail] = useState("");
+  const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // Hooks
   const router = useRouter();
@@ -83,6 +87,25 @@ export function MainNavbar() {
     handleCloseLogInModal();
     window.dispatchEvent(new Event("cartUpdate"));
   }, [handleCloseLogInModal]);
+
+  // Sign up success handler
+  const handleSignUpSuccess = useCallback(
+    (email: string) => {
+      handleCloseSignUpModal();
+      setRegisteredEmail(email);
+      setWelcomeMessage(
+        `Welcome! Your account has been successfully created. Please log in with your new credentials.`
+      );
+      setShowSuccessMessage(true);
+
+      // Show success message for 2 seconds before opening login modal
+      setTimeout(() => {
+        setShowSuccessMessage(false);
+        handleOpenLogInModal();
+      }, 2000);
+    },
+    [handleCloseSignUpModal, handleOpenLogInModal]
+  );
 
   // Logout handler
   const handleLogout = useCallback(() => {
@@ -336,7 +359,10 @@ export function MainNavbar() {
         handler={handleCloseSignUpModal}
         className="bg-transparent shadow-none"
       >
-        <SignUpForm onClose={handleCloseSignUpModal} />
+        <SignUpForm
+          onClose={handleCloseSignUpModal}
+          onSignUpSuccess={handleSignUpSuccess}
+        />
       </Dialog>
 
       {/* Log In Dialog */}
@@ -348,6 +374,8 @@ export function MainNavbar() {
         <LoginForm
           onClose={handleCloseLogInModal}
           onLoginSuccess={handleLoginSuccess}
+          initialEmail={registeredEmail}
+          welcomeMessage={welcomeMessage}
         />
       </Dialog>
 
@@ -364,6 +392,19 @@ export function MainNavbar() {
 
       {/* Cart Drawer */}
       <CartDrawer open={openCart} onClose={handleCloseCart} />
+
+      {/* Success Message Alert */}
+      <Alert
+        open={showSuccessMessage}
+        onClose={() => setShowSuccessMessage(false)}
+        animate={{
+          mount: { y: 0 },
+          unmount: { y: 100 }
+        }}
+        className="fixed bottom-4 left-4 w-max"
+      >
+        Account created successfully!
+      </Alert>
     </>
   );
 }
