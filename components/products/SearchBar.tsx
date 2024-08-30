@@ -7,11 +7,12 @@ interface SearchBarProps {
 
 export function SearchBar({ searchTerm, setSearchTerm }: SearchBarProps) {
   return (
-    <div className="w-full mb-4">
+    <div className="mb-4">
       <Input
-        label="Search products"
+        label="Search"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
+        className="md:max-w-[8rem] lg:max-w-[30rem]"
         icon={
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -19,7 +20,7 @@ export function SearchBar({ searchTerm, setSearchTerm }: SearchBarProps) {
             viewBox="0 0 24 24"
             strokeWidth="1.5"
             stroke="currentColor"
-            className="size-6"
+            className="w-5 h-5"
           >
             <path
               strokeLinecap="round"

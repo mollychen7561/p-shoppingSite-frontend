@@ -11,7 +11,6 @@ class UserApi {
 
   private async request(endpoint: string, options: RequestInit = {}) {
     const url = `${this.baseUrl}${endpoint}`;
-    console.log(`Starting request to: ${url}`, options);
 
     try {
       const response = await fetch(url, {
@@ -23,60 +22,41 @@ class UserApi {
         }
       });
 
-      console.log(`Response status: ${response.status}`);
+      // console.log(`Response status: ${response.status}`);
 
       if (!response.ok) {
-        const errorBody = await response.text();
-        console.error(
-          `API Error: ${response.status} ${response.statusText}`,
-          errorBody
-        );
         throw new Error(
           `API request failed: ${response.status} ${response.statusText}`
         );
       }
 
       const data = await response.json();
-      console.log("Response data:", data);
       return data;
     } catch (error) {
-      console.error("Request error:", error);
       throw error;
     }
   }
 
   async login(credentials: any) {
-    console.log("Attempting login with credentials:", {
-      email: credentials.email,
-      password: "********"
-    });
     try {
       const result = await this.request("/users/login", {
         method: "POST",
         body: JSON.stringify(credentials)
       });
-      console.log("Login successful:", result);
       return result;
     } catch (error) {
-      console.error("Login failed:", error);
       throw error;
     }
   }
 
   async register(userData: any) {
-    console.log("Attempting to register user:", {
-      ...userData,
-      password: "********"
-    });
     try {
       const result = await this.request("/users/register", {
         method: "POST",
         body: JSON.stringify(userData)
       });
-      console.log("Registration successful:", result);
       return result;
     } catch (error) {
-      console.error("Registration failed:", error);
       throw error;
     }
   }

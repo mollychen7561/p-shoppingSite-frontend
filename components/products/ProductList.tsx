@@ -93,34 +93,36 @@ const ProductList: React.FC = () => {
   }, [searchTerm, category, products]);
 
   return (
-    <div className="flex flex-col md:flex-row">
-      <div className="md:w-1/4 p-4">
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-        <CategoryList setCategory={setCategory} />
-      </div>
-      <div className="md:w-3/4 p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredProducts.map((product) => (
-            <Link key={product.id} href={`/products/${product.id}`} passHref>
-              <div className="border p-4 rounded-xl shadow">
-                <Image
-                  src={product.image}
-                  alt={product.title}
-                  className="w-full h-60 object-contain mb-4"
-                  width={500}
-                  height={500}
-                />
-                <h2 className="text-xl font-semibold line-clamp-1">
-                  {product.title}
-                </h2>
-                <div className="flex justify-end">
-                  <p className="text-gray-700 text-lg font-semibold">
-                    ${product.price}
+    <div className="container mx-auto px-4">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="md:col-span-1 mb-4 md:mb-0">
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+          <CategoryList setCategory={setCategory} />
+        </div>
+        <div className="md:col-span-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredProducts.map((product) => (
+              <Link key={product.id} href={`/products/${product.id}`} passHref>
+                <div className="border p-4 rounded-xl shadow h-full flex flex-col">
+                  <div className="relative w-full pt-[100%] mb-4">
+                    <Image
+                      src={product.image}
+                      alt={product.title}
+                      layout="fill"
+                      objectFit="contain"
+                      className="rounded-lg"
+                    />
+                  </div>
+                  <h2 className="text-lg font-semibold line-clamp-2 mb-2 flex-grow">
+                    {product.title}
+                  </h2>
+                  <p className="text-gray-700 text-lg font-semibold text-right">
+                    ${product.price.toFixed(2)}
                   </p>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
     </div>

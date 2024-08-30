@@ -33,10 +33,7 @@ export function LoginForm({
     setMessage("");
 
     try {
-      console.log("Sending login request with email:", email);
       const response = await userApi.login({ email, password });
-
-      console.log("Received login response:", response);
 
       if (response.user && response.token) {
         const userData = {
@@ -53,15 +50,42 @@ export function LoginForm({
 
         window.dispatchEvent(new Event("cartUpdate"));
       } else {
-        console.error("Unexpected server response:", response);
-        setMessage("Login failed: Unexpected response from server");
+        setMessage(
+          "Login failed: Please check your email and password, then try again."
+        );
       }
     } catch (error) {
-      console.error("Detailed login error:", error);
       if (error instanceof Error) {
-        setMessage(`Login failed: ${error.message}`);
+        // Provide more specific user feedback based on error type or message
+        if (
+          error.message.includes("network") ||
+          error.message.includes("Network")
+        ) {
+          setMessage(
+            "Login failed: Network connection issue. Please check your internet connection and try again."
+          );
+        } else if (error.message.includes("400")) {
+          setMessage(
+            "Login failed: Invalid request. Please ensure all required fields are filled correctly."
+          );
+        } else if (
+          error.message.includes("401") ||
+          error.message.includes("unauthorized")
+        ) {
+          setMessage(
+            "Login failed: Incorrect email or password. Please double-check and try again."
+          );
+        } else if (error.message.includes("500")) {
+          setMessage("Login failed: Server error. Please try again later.");
+        } else {
+          setMessage(
+            "Login failed: An unknown error occurred. Please try again later or contact customer support."
+          );
+        }
       } else {
-        setMessage("An unexpected error occurred");
+        setMessage(
+          "Login failed: An unexpected error occurred. Please try again later."
+        );
       }
     }
   };
