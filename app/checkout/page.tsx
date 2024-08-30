@@ -161,11 +161,14 @@ const CheckOutPage = () => {
         }
       });
 
-      if (response.success) {
+      if (response && response.order) {
         setIsModalOpen(true);
         clearCart();
+      } else {
+        throw new Error("Unexpected response format");
       }
     } catch (error) {
+      console.error("Order creation error:", error);
       setFormError("Failed to create order. Please try again.");
     }
   };

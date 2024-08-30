@@ -34,7 +34,17 @@ const WishlistPage = () => {
       setError(null);
       try {
         // Get favorite product IDs
-        const favoriteIds = await userApi.getFavorites(token);
+        const favoritesResponse = await userApi.getFavorites(token);
+
+        const favoriteIds = Array.isArray(favoritesResponse.favorites)
+          ? favoritesResponse.favorites
+          : [];
+
+        if (favoriteIds.length === 0) {
+          setFavorites([]);
+          setIsLoading(false);
+          return;
+        }
 
         // Fetch details for each favorite product
         const productPromises = favoriteIds.map((id: number) =>
@@ -47,6 +57,7 @@ const WishlistPage = () => {
 
         setFavorites(favoriteProducts);
       } catch (error) {
+        console.error("Error fetching favorites:", error);
         if (error instanceof Error) {
           setError(error.message || "Failed to load wishlist");
         } else {
