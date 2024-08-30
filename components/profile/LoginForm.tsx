@@ -33,7 +33,10 @@ export function LoginForm({
     setMessage("");
 
     try {
+      console.log("Sending login request with email:", email);
       const response = await userApi.login({ email, password });
+
+      console.log("Received login response:", response);
 
       if (response.user && response.token) {
         const userData = {
@@ -50,10 +53,11 @@ export function LoginForm({
 
         window.dispatchEvent(new Event("cartUpdate"));
       } else {
+        console.error("Unexpected server response:", response);
         setMessage("Login failed: Unexpected response from server");
       }
     } catch (error) {
-      console.error("Login error:", error);
+      console.error("Detailed login error:", error);
       if (error instanceof Error) {
         setMessage(`Login failed: ${error.message}`);
       } else {
