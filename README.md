@@ -1,15 +1,20 @@
-## React Shopping Website Side Project
+## Next.js Shopping Website Side Project
 
 ## Description
 
-<center><img src="https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1" width="60%"/></center>
 
-[p-shopping-site-frontend.vercel.app](https://p-shopping-site-frontend.vercel.app/)
+Vercel Link: [p-shopping-site-frontend.vercel.app](https://p-shopping-site-frontend.vercel.app/)
 
 ### Features
 
+<center><img src="https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1" width="60%"/></center>
+
 - The homepage displays product carousels and category links, and users can click on the products or categories they are interested in.
+
+<center><img src="https://github.com/user-attachments/assets/f4ee8a64-4169-4b77-ba94-6a4ae5ce7947" width="60%"/></center>
 - The product page displays all products. In addition to searching for the desired product through the search bar, users can also click on the product category they are interested in from the category bar on the left.
+
+
 - Each product has its own page, displaying the product name, price and description. Users can click on the heart to collect the products they are interested in and view them on their personal page. After the user clicks on the product quantity and adds it to the shopping cart, the shopping cart list will pop up to inform the user of the currently added products, quantity and total price. In addition, related product recommendations are also provided.
 - Modals for user login and registration.
 - Users can go to the checkout page to confirm their shopping list, use coupons, and leave recipient information to receive the goods.
@@ -53,7 +58,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-📌 Notice
+### 📌 Notice
 If you want to deploy to vercel and connect to MongoDB Atlas:
 1. Go to the setting -> Integrations -> MongoDB Atlas Connect Account of the vercel project.
 2. MongoDB Atlas -> Database Access -> Use vercel-admin-user and its password in vercel as the MONGODB_URI of the project environment variable. Remember to add your JWT_SECRET and CORS_ORIGIN (front-end URL).
