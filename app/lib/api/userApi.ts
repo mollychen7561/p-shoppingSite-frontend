@@ -136,9 +136,19 @@ class UserApi {
   }
 
   async getFavorites(token: string) {
-    return this.request("/users/favorites", {
-      headers: { Authorization: `Bearer ${token}` }
-    });
+    try {
+      const response = await this.request("/users/favorites", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (response && Array.isArray(response.favorites)) {
+        return response.favorites;
+      } else {
+        throw new Error("Unexpected favorites format");
+      }
+    } catch (error) {
+      throw error;
+    }
   }
 
   async createOrder(token: string, orderData: any) {

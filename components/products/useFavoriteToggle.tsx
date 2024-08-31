@@ -12,9 +12,12 @@ export const useFavoriteToggle = (productId: number) => {
 
     try {
       const favorites = await userApi.getFavorites(token);
-      setIsFavorite(favorites.includes(productId));
+
+      // Convert productId to string for comparison
+      setIsFavorite(favorites.includes(productId.toString()));
     } catch (error) {
-      toast.error("Error checking favorite status");
+      console.error("Error checking favorite status:", error);
+      toast.error(`Error checking favorite status: ${error.message}`);
     }
   }, [user, token, productId]);
 
@@ -30,9 +33,9 @@ export const useFavoriteToggle = (productId: number) => {
 
     try {
       if (isFavorite) {
-        await userApi.removeFavorite(token, productId);
+        await userApi.removeFavorite(token, productId.toString());
       } else {
-        await userApi.addFavorite(token, productId);
+        await userApi.addFavorite(token, productId.toString());
       }
 
       setIsFavorite(!isFavorite);
@@ -42,7 +45,7 @@ export const useFavoriteToggle = (productId: number) => {
           : "Product added to favorites"
       );
     } catch (error) {
-      toast.error("Error managing favorites");
+      toast.error(`Error managing favorites: ${error.message}`);
     }
   };
 

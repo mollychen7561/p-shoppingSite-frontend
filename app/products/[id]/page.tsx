@@ -51,6 +51,8 @@ const ProductPageContent = () => {
     }
   }, [user, login]);
 
+  useEffect(() => {}, [isFavorite]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -116,6 +118,7 @@ const ProductPageContent = () => {
               alt={product.title}
               width={200}
               height={200}
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-contain max-w-full max-h-full hover:scale-125 transition duration-300 ease-in-out"
             />
           </div>

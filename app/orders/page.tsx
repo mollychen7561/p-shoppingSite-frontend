@@ -51,7 +51,12 @@ const OrdersPage = () => {
       try {
         // Fetch orders using the API client
         const data = await userApi.getOrders(token);
-        setOrders(data);
+        // Sort orders by date, most recent first
+        const sortedOrders = data.sort(
+          (a, b) =>
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        setOrders(sortedOrders);
       } catch (error) {
         if (error instanceof Error) {
           setError(error.message || "Failed to load orders");
@@ -125,13 +130,18 @@ const OrdersPage = () => {
                                 key={item.productId}
                                 className="flex items-center space-x-2"
                               >
-                                <Image
-                                  src={item.image || "/placeholder.png"}
-                                  alt={item.name}
-                                  width={40}
-                                  height={40}
-                                  className="object-cover rounded"
-                                />
+                                <div className="relative w-10 h-10">
+                                  <Image
+                                    src={item.image || "/placeholder.png"}
+                                    alt={item.name}
+                                    fill
+                                    sizes="40px"
+                                    style={{
+                                      objectFit: "cover"
+                                    }}
+                                    className="rounded"
+                                  />
+                                </div>
                                 <Typography
                                   variant="small"
                                   color="blue-gray"
@@ -202,13 +212,18 @@ const OrdersPage = () => {
                       key={item.productId}
                       className="flex items-center space-x-2 mb-2"
                     >
-                      <Image
-                        src={item.image || "/placeholder.png"}
-                        alt={item.name}
-                        width={40}
-                        height={40}
-                        className="object-cover rounded"
-                      />
+                      <div className="relative w-10 h-10">
+                        <Image
+                          src={item.image || "/placeholder.png"}
+                          alt={item.name}
+                          fill
+                          sizes="40px"
+                          style={{
+                            objectFit: "cover"
+                          }}
+                          className="rounded"
+                        />
+                      </div>
                       <Typography
                         variant="small"
                         color="blue-gray"

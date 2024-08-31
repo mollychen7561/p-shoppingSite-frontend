@@ -104,13 +104,13 @@ const ProductList: React.FC = () => {
             {filteredProducts.map((product) => (
               <Link key={product.id} href={`/products/${product.id}`} passHref>
                 <div className="border p-4 rounded-xl shadow h-full flex flex-col">
-                  <div className="relative w-full pt-[100%] mb-4">
+                  <div className="relative w-full aspect-square mb-4">
                     <Image
                       src={product.image}
                       alt={product.title}
-                      layout="fill"
-                      objectFit="contain"
-                      className="rounded-lg"
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="rounded-lg object-contain"
                     />
                   </div>
                   <h2 className="text-lg font-semibold line-clamp-2 mb-2 flex-grow">

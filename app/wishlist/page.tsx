@@ -36,9 +36,17 @@ const WishlistPage = () => {
         // Get favorite product IDs
         const favoritesResponse = await userApi.getFavorites(token);
 
-        const favoriteIds = Array.isArray(favoritesResponse.favorites)
-          ? favoritesResponse.favorites
-          : [];
+        let favoriteIds: number[] = [];
+        if (Array.isArray(favoritesResponse)) {
+          favoriteIds = favoritesResponse.map((id) => parseInt(id, 10));
+        } else if (
+          favoritesResponse &&
+          Array.isArray(favoritesResponse.favorites)
+        ) {
+          favoriteIds = favoritesResponse.favorites.map((id) =>
+            parseInt(id, 10)
+          );
+        }
 
         if (favoriteIds.length === 0) {
           setFavorites([]);
@@ -47,17 +55,27 @@ const WishlistPage = () => {
         }
 
         // Fetch details for each favorite product
-        const productPromises = favoriteIds.map((id: number) =>
-          fetch(`https://fakestoreapi.com/products/${id}`).then((res) =>
-            res.json()
-          )
-        );
+        const productPromises = favoriteIds.map(async (id: number) => {
+          try {
+            const response = await fetch(
+              `https://fakestoreapi.com/products/${id}`
+            );
+            if (!response.ok) {
+              throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+          } catch (error) {
+            console.error(`Error fetching product ${id}:`, error);
+            return null;
+          }
+        });
 
-        const favoriteProducts = await Promise.all(productPromises);
+        const favoriteProducts = (await Promise.all(productPromises)).filter(
+          (product) => product !== null
+        );
 
         setFavorites(favoriteProducts);
       } catch (error) {
-        console.error("Error fetching favorites:", error);
         if (error instanceof Error) {
           setError(error.message || "Failed to load wishlist");
         } else {
@@ -74,10 +92,11 @@ const WishlistPage = () => {
   // Remove a product from favorites
   const removeFavorite = async (productId: number) => {
     try {
-      await userApi.removeFavorite(token, productId);
+      await userApi.removeFavorite(token, productId.toString());
       setFavorites(favorites.filter((product) => product.id !== productId));
       toast.success("Product removed from wishlist");
     } catch (error) {
+      console.error("Error removing favorite:", error);
       toast.error("Failed to remove product from wishlist");
     }
   };
