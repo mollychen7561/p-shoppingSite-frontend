@@ -2,7 +2,7 @@
 
 ## Description
 
-<center><img src="[https://github.com/mollychen7561/p-calculator/blob/main/public/calculator.png](https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1)" width="60%"/></center>
+<center><img src="https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1" width="60%"/></center>
 
 [p-shopping-site-frontend.vercel.app](https://p-shopping-site-frontend.vercel.app/)
 
@@ -34,7 +34,9 @@
 
 ## Getting Started
 
-First, run the development server:
+Clone Backend: https://github.com/mollychen7561/p-shoppingSite-backend/
+
+Run the development server:
 
 ```bash
 npm run dev
@@ -47,12 +49,9 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+(The backend will run on port 5001.)
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-Backend Link: https://github.com/mollychen7561/p-shoppingSite-backend/
 
 📌 Notice
 If you want to deploy to vercel and connect to MongoDB Atlas:
