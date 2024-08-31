@@ -20,7 +20,6 @@ https://github.com/user-attachments/assets/22b943a6-992c-41f5-a699-f1376085a576
 > Vercel Link: [p-shopping-site-frontend.vercel.app](https://p-shopping-site-frontend.vercel.app/)
 
 ## Tools
-
 - frontend
   - TypeScript
   - React
@@ -59,7 +58,8 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 ### 📌 Notice
 If you want to deploy to vercel and connect to MongoDB Atlas:
-1. Go to the setting -> Integrations -> MongoDB Atlas Connect Account of the vercel project.
-2. MongoDB Atlas -> Database Access -> Use vercel-admin-user and its password in vercel as the MONGODB_URI of the project environment variable. Remember to add your JWT_SECRET and CORS_ORIGIN (front-end URL).
+1. The frontend and backend may need to be deployed separately, as deploying them together often results in failure for me.
+2. Go to backend project setting -> Integrations -> MongoDB Atlas Connect Account of the vercel project.
+3. Go to MongoDB Atlas -> Database Access -> Use vercel-admin-user and its password in vercel as the MONGODB_URI of the project environment variable. Remember to add your JWT_SECRET and CORS_ORIGIN (front-end URL).
 
 
