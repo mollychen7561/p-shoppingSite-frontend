@@ -1,24 +1,26 @@
 ## Next.js Shopping Website Side Project
 
 ## Description
+<center><img src="https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1" width="60%"/></center>
+
+
 
 
 Vercel Link: [p-shopping-site-frontend.vercel.app](https://p-shopping-site-frontend.vercel.app/)
 
 ### Features
 
-<center><img src="https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1" width="60%"/></center>
+https://github.com/user-attachments/assets/22b943a6-992c-41f5-a699-f1376085a576
 
 - The homepage displays product carousels and category links, and users can click on the products or categories they are interested in.
 
-<center><img src="https://github.com/user-attachments/assets/f4ee8a64-4169-4b77-ba94-6a4ae5ce7947" width="60%"/></center>
-- The product page displays all products. In addition to searching for the desired product through the search bar, users can also click on the product category they are interested in from the category bar on the left.
+- The product page displays all products. Users can search for the desired product using the search bar or click on a product category from the category bar on the left to filter the products.
 
-
-- Each product has its own page, displaying the product name, price and description. Users can click on the heart to collect the products they are interested in and view them on their personal page. After the user clicks on the product quantity and adds it to the shopping cart, the shopping cart list will pop up to inform the user of the currently added products, quantity and total price. In addition, related product recommendations are also provided.
-- Modals for user login and registration.
-- Users can go to the checkout page to confirm their shopping list, use coupons, and leave recipient information to receive the goods.
-- The About page briefly describes the introduction of this shopping website and the types of products sold.
+- Each product has its own page that shows the product name, price, and description. Users can click the “Heart” icon to save products they are interested in and view them on their personal page. After selecting the quantity and adding the product to the shopping cart, users can open the shopping cart page to view the products they have added, along with the quantity and total price. Additionally, relevant product recommendations are provided.
+  
+- Modals for user login and registration are available.
+- Users can proceed to the checkout page to confirm their shopping list, apply coupons, and provide recipient information for delivery.
+- The About page briefly describes this shopping website and the types of products it offers.
 
 ### Tools
 
