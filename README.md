@@ -22,7 +22,7 @@ https://github.com/user-attachments/assets/22b943a6-992c-41f5-a699-f1376085a576
 > Vercel Link: [p-shopping-site-frontend.vercel.app](https://p-shopping-site-frontend.vercel.app/)
 
 ## Product Data Source
-https://fakestoreapi.com/
+> https://fakestoreapi.com/
 
 ## Tools
 - frontend
