@@ -4,8 +4,8 @@
 
 ## Description
 
-<center><img src="https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1" width="60%"/></center>
 This frontend project provides users with e-commerce experience, including product browsing, shopping cart management,  and order placement. Built with Next.js and React, it ensures excellent performance and user experience. Additionally, by utilizing Tailwind CSS and Material-Tailwind, the project achieves an aesthetically pleasing and consistent user interface design.
+<center><img src="https://github.com/user-attachments/assets/245ba455-630f-44a8-8f63-a2bb1cb2a2f1" width="60%"/></center>
 
 ## Features
 - The homepage displays product carousels and category links, and users can click on the products or categories they are interested in.
